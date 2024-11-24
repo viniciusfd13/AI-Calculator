@@ -11,6 +11,9 @@
         body { margin: 0; padding: 20px; font-family: Arial, sans-serif; background: #f0f2f5; }
         .container { max-width: 800px; margin: 0 auto; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
         .title { text-align: center; color: #1a73e8; }
+        .form-group { margin-bottom: 16px; }
+        label { display: block; margin-bottom: 8px; font-weight: bold; }
+        input { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
         #savingsChart { margin-top: 20px; }
     </style>
 </head>
@@ -28,72 +31,11 @@
             });
             const [chartData, setChartData] = useState([]);
 
-            useEffect(() => {
-                const savings = Array.from({ length: 12 }, (_, i) => (data.hourlyRate * data.timeSaving / 100) * data.employees * (i + 1));
-                setChartData(savings);
-            }, [data]);
-
-            function handleInputChange(event) {
-                const { name, value } = event.target;
-                setData({ ...data, [name]: Number(value) });
-            }
+            const calculateSavings = () => {
+                const monthlySavings = ((data.hourlyRate * data.timeSaving / 100) * data.employees) * 4; // 4 weeks per month
+                const cumulativeSavings = Array.from({ length: 12 }, (_, i) => monthlySavings * (i + 1));
+                setChartData(cumulativeSavings);
+            };
 
             useEffect(() => {
-                const ctx = document.getElementById('savingsChart');
-                if (ctx) {
-                    new Chart(ctx, {
-                        type: 'line',
-                        data: {
-                            labels: Array.from({ length: 12 }, (_, i) => `Month ${i + 1}`),
-                            datasets: [{
-                                label: 'Cumulative Savings ($)',
-                                data: chartData,
-                                borderColor: 'blue',
-                                tension: 0.3,
-                            }],
-                        },
-                    });
-                }
-            }, [chartData]);
-
-            return React.createElement('div', { className: 'container' },
-                React.createElement('h1', { className: 'title' }, 'AI ROI Calculator'),
-                React.createElement('div', null,
-                    React.createElement('label', null, 'Number of Employees'),
-                    React.createElement('input', {
-                        type: 'number',
-                        name: 'employees',
-                        value: data.employees,
-                        onChange: handleInputChange,
-                    }),
-                    React.createElement('label', null, 'Hourly Rate ($)'),
-                    React.createElement('input', {
-                        type: 'number',
-                        name: 'hourlyRate',
-                        value: data.hourlyRate,
-                        onChange: handleInputChange,
-                    }),
-                    React.createElement('label', null, 'Time Saving (%)'),
-                    React.createElement('input', {
-                        type: 'number',
-                        name: 'timeSaving',
-                        value: data.timeSaving,
-                        onChange: handleInputChange,
-                    }),
-                    React.createElement('label', null, 'Implementation Cost ($)'),
-                    React.createElement('input', {
-                        type: 'number',
-                        name: 'cost',
-                        value: data.cost,
-                        onChange: handleInputChange,
-                    })
-                ),
-                React.createElement('canvas', { id: 'savingsChart', width: '400', height: '200' })
-            );
-        }
-
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(React.createElement(Calculator));
-    </script>
-</body>
-</html>
+                calculateS
